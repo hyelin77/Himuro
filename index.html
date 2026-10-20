@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>히무로 프로필</title>
+    <style>
+        /* === 나무위키 기본 테마 및 테두리/색상 정의 === */
+        :root {
+            --namu-green: #008275;      /* 나무위키 시그니처 초록색 */
+            --namu-dark-green: #005f55;
+            --namu-bg: #ffffff;
+            --namu-gray-bg: #f5f5f5;
+            --namu-border: #ccc;
+            --namu-text: #373a3c;
+            --namu-link: #0275d8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: var(--namu-text);
+            background-color: #f2f2f2;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        a {
+            color: var(--namu-link);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* === 상단 헤더 === */
+        header {
+            background-color: var(--namu-green);
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .search-bar input {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            outline: none;
+            width: 200px;
+        }
+
+        /* === 메인 레이아웃 === */
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            background: var(--namu-bg);
+            padding: 25px 30px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        /* 문서 제목 */
+        .doc-title {
+            font-size: 32px;
+            font-weight: normal;
+            border-bottom: 2px solid var(--namu-green);
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .doc-tools {
+            font-size: 13px;
+        }
+
+        .doc-tools a {
+            margin-left: 8px;
+            color: #666;
+            background: #eee;
+            padding: 4px 8px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+        }
+
+        /* 레이아웃 분할 (본문 + 우측 프로필 인포박스) */
+        .content-wrapper {
+            display: flex;
+            flex-direction: row-reverse; /* 인포박스를 우측에 배치 */
+            align-items: flex-start;    /* 우측 인포박스가 늘어나지 않고 내용 크기대로 유지 */
+            gap: 20px;
+        }
+
+        /* === 프로필 인포박스 (나무위키 특유 테이블) === */
+        .infobox {
+            width: 320px;
+            border: 2px solid var(--namu-green);
+            border-collapse: collapse;
+            font-size: 13px;
+            float: right;
+            margin-top: 5px;
+            margin-bottom: 25px;
+            background: #fff;
+        }
+
+        .infobox th, .infobox td {
+            border: 1px solid #ddd;
+            padding: 6px 10px;
+        }
+
+        .infobox .title {
+            background-color: var(--namu-green);
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+        }
+
+        .infobox .image-cell {
+            text-align: center;
+            background-color: #fff;
+            padding: 10px;
+        }
+
+        .infobox .image-cell img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .infobox th {
+            background-color: #f0f8f7;
+            color: var(--namu-dark-green);
+            width: 30%;
+            text-align: center;
+            word-break: keep-all;
+        }
+
+        .main-text {
+            flex: 1;
+            min-width: 0; /* flex 자식 넘침 방지 */
+        }
+
+        /* === 목차 (TOC) === */
+        .toc {
+            background-color: var(--namu-gray-bg);
+            border: 1px solid var(--namu-border);
+            display: inline-block;
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            min-width: 250px;
+        }
+
+        .toc-title {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 3px;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            margin: 3px 0;
+        }
+
+        .toc .toc-num {
+            color: var(--namu-green);
+            font-weight: bold;
+        }
+
+        /* === 문단 제목 (Heading) === */
+        h2 {
+            font-size: 20px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        h2 .wiki-num {
+            color: var(--namu-green);
+        }
+
+        h3 {
+            font-size: 16px;
+            margin-top: 20px;
+            margin-bottom: 8px;
+        }
+
+        h3 .wiki-num {
+            color: var(--namu-green);
+        }
+
+        p {
+            margin-bottom: 12px;
+        }
+
+        /* 스포일러 토글 접기/펴기 스타일 */
+        /* .spoiler-details {
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fafafa;
+        } */
+
+        .spoiler-details summary {
+            cursor: pointer;
+            padding: 6px 12px;
+            font-weight: bold;
+            color: black;
+            /* background-color: #f2f2f2;
+            border-radius: 4px; */
+            user-select: none;
+            outline: none;
+        }
+
+        /* .spoiler-details summary:hover {
+            background-color: #e8e8e8;
+        }
+
+        .spoiler-content {
+            padding: 12px 15px 4px 15px;
+        } */
+
+        /* 강조 박스 / 인용구 */
+        .wiki-quote {
+            border-left: 4px solid var(--namu-green);
+            background-color: #f9f9f9;
+            padding: 10px 15px;
+            margin: 10px 0;
+            font-style: italic;
+        }
+
+        /* 각주 스타일 */
+        .footnote-ref {
+            font-size: 11px;
+            vertical-align: super;
+            color: var(--namu-link);
+            font-weight: bold;
+        }
+
+        .footnotes {
+            margin-top: 40px;
+            border-top: 2px solid #ddd;
+            padding-top: 10px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* 반응형 (모바일 대응) */
+        @media (max-width: 768px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+            .infobox {
+                width: 100%;
+                float: none;
+                margin-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Himuro</div>
+    </header>
+
+    <div class="container">
+        <div class="doc-title">
+            <span><b>히무로</b></span>
+        </div>
+
+        <div class="content-wrapper">
+            
+            <table class="infobox">
+                <tr>
+                    <th colspan="2" class="title">히무로 모토아키<br><span style="font-size: 12px; font-weight: normal;">Himuro Motoaki</span></th>
+                </tr>
+                <tr>
+                    <td colspan="2" class="image-cell">
+                        <!-- 프로필 이미지 경로를 넣어주세요 -->
+                        <img src="https://lh3.googleusercontent.com/d/16bHZPAWhuh9ivvPReNpOmJRcyZQtPGag" alt="프로필 사진">
+                    </td>
+                </tr>
+                <tr>
+                    <th>이름</th>
+                    <td>히무로 모토아키 氷室 基陽(ひむろもとあき)</td>
+                </tr>
+                <tr>
+                    <th>성별</th>
+                    <td>남성</td>
+                </tr>
+                <tr>
+                    <th>나이</th>
+                    <td>40대 중후반</td>
+                </tr>
+                <tr>
+                    <th>소속</th>
+                    <td>제 7사단</td>
+                </tr>
+                <tr>
+                    <th>계급</th>
+                    <td>무기 관리 / 보급 실무 군조(중사)</td>
+                </tr>
+                <tr>
+                    <th>좋아하는 것</th>
+                    <td>수시키<a href="#fn-1" class="footnote-ref" id="ref-1">[1]</a>, 홍차</td>
+                </tr>
+                <tr>
+                    <th>가족</th>
+                    <td style="text-decoration: line-through;">아내</td>
+                </tr>
+            </table>
+
+            <div class="main-text">
+                
+
+                <div class="toc">
+                    <div class="toc-title">목차</div>
+                    <ul>
+                        <li><a href="#s-1"><span class="toc-num">1.</span> 개요</a></li>
+                        <li><a href="#s-2"><span class="toc-num">2.</span> 작중 행적</a></li>
+                        <li>
+                            <a href="#s-3"><span class="toc-num">3.</span> 과거</a>
+                            <ul>
+                                <li><a href="#s-3-1"><span class="toc-num">3.1.</span> 과거[스포일러]</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#s-4"><span class="toc-num">4.</span> 인간관계</a>
+                            <ul>
+                                <li><a href="#s-4-1"><span class="toc-num">4.1.</span> 베라 체르노바</a></li>
+                            </ul>
+                            <ul>
+                                <li><a href="#s-4-2"><span class="toc-num">4.2.</span> 오가타 햐쿠노스케</a></li>
+                            </ul>
+                            <ul>
+                                <li><a href="#s-4-3"><span class="toc-num">4.3.</span> 츠키시마 하지메</a></li>
+                            </ul>
+                            <ul>
+                                <li><a href="#s-4-4"><span class="toc-num">4.4.</span> 츠루미 토쿠시로</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#s-5"><span class="toc-num">5.</span> 기타</a></li>
+                    </ul>
+                </div>
+
+                <h2 id="s-1"><span class="wiki-num">1.</span> 개요</h2>
+                <div style="text-align: center; margin: 15px 0;">
+                    <img src="https://lh3.googleusercontent.com/d/1-Z3Qikd_o5Eqap-essjv91my6ym_chmi" alt="" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid #ddd;">
+                    <p style="font-size: 12px; color: #666; margin-top: 5px;">▲ 전체적인 인상</p>
+                </div>
+                <p>만화 골든 카무이의 등장인물로, 홋카이도 주둔 제7사단 소속으로 27연대 츠루미 중위 소대 소속 무기 관리, 보급 실무 담당 군조이다. 풀네임은 <b>히무로 모토아키(氷室 基陽).</b></p>
+                <br>
+                <p>대충 넘긴 올백 머리 스타일에 진중하고 무뚝뚝한 인상의 얼굴이다. 전형적인 중년의 모습으로, 하사시인 왼쪽 눈과 그 주변을 둘러싼 흉터가 특징이다.</p>
+                <br>
+                <p>왼쪽 눈이 사시다. 아래를 향한 하사시로, 오른쪽 눈의 좌우 움직임은 따라가지만, 상하로는 고정되어 있다. 폭탄으로 인해 후천적으로 사시가 되었지만 어느 정도 유전의 영향을 받았다.</p>
+                <p>하사시 초반에는 물체가 여러 개로 보이는 복시, 일부 통증을 동반하긴 했지만 완전한 실명은 아니었다. 하지만 복시로 인해 시야 방해가 심해, 완전히 실명될 때까지 안대를 쓰고 다녔다. 완전히 실명한 현재는 안대를 벗고 다닌다.</p>
+                <p>전투 능력이 좋은 편은 아니다. 신체 능력보다는 전투 센스로 대응하는 경우가 많으며, 사격보다는 체술에 강하다. 사시가 되기 이전에는 10발 중 8발은 맞추는 수준이었으나, 사시가 된 후로 10발 중 4발을 맞추는 수준까지 떨어져 주로 사용하던 30식 소총에서 무라타 산탄총으로 주 무기를 교체하였다.</p>
+                <br>
+                <p>작중 포지션은 샌드백. 계급이 높은 편임에도 자주 무시당하는 모습을 보인다. 특히 상등병 두 명에게 대놓고 무시를 당하는 경우가 많다. 군대에서 보낸 시간과 나이에 비해 낮은 계급인 탓이 큰 듯하다.</p>
+                <br>
+                <p>직접 전투에 참여하기 보다는 서류 작업이나 상부와의 소통 면을 주로 담당한다. 츠루미 중위가 자리를 비웠을 때 츠루미 중위의 일을 대신 처리해주기도 한다.</p>
+
+                <h2 id="s-2"><span class="wiki-num">2.</span> 작중 행적</h2>
+                <p>단행본 11권에서 처음 등장했다. 오타루에 죄수 사냥을 간 츠루미 중위의 업무와 빈자리를 대신 맡았다. 보통은 츠루미 중위의 오른팔인 츠키시마의 역할이지만 오타루 죄수 사냥에서는 츠키시마에 코이토 소위까지 따라나선 탓에 히무로가 자리를 채웠다.</p>
+                <br>
+                <details class="spoiler-details">
+                    <summary>[스포일러]</summary>
+                    <div class="spoiler-content">
+                        <p>아내의 죽음과 관련하여 개인적으로 소피아의 행적을 조사하다가 키로란케 무리에서 정찰 중인 오가타와 마주한다(단행본 16권에서 17권 사이). 탈영병인 오가타를 잡아 츠루미 중위에게 데려갈 생각이었으나, 오가타에게서 아내의 죽음과 관련된 모든 사실을 알게 되고 절망에 빠진 나머지 오가타를 놓친다. 이후 알렉산드로프스카야 감옥과 혁명군 쪽을 조사한다는 핑계로 츠루미 소대와 일시적으로 거리를 두게 된다.</p>
+                        <p>이후 오오도마리에서 츠루미 중위와 재회해 다시 함께 움직인다(단행본 21권 시점). 이때 의도적으로 츠키시마를 피하는 모습을 보인다.</p>
+                        <br>
+                        <div class="wiki-quote">
+                            "하핫, 이젠 <b>외눈 동지</b>로군요. 내기에서 이긴 쪽이 두 눈을 갖는 걸로 할까요?"
+                            <br><hr>—오가타 햐쿠노스케, 골든카무이 26권 中에서
+                        </div>
+                        <p>우사미를 죽인 후의 오가타와 마주했다. 모든 사실을 알기 전과 달리 오가타를 잡으려 들지 않았으며, 츠루미 중위에 대한 간단한 스몰 토크만 한 뒤 헤어진다.</p>
+                    </div>
+                </details>
+                <br>
+                <p>나머지는 재정주행 후 작성.</p>
+
+
+                <h2 id="s-3"><span class="wiki-num">3.</span> 과거</h2>
+                <p>20대가 되자마자 육군에 입대하였다. 러일 전쟁에 참여하였으며, 뤼순 공방전에서 폭탄으로 인해 중상을 입었다. 이때 사시와 흉터가 생겼다.</p>
+                <br>
+                <p>러일 전쟁 이전 30대 중반에 러시아 여성인 베라 체르노바를 만나 3년 간의 연애 후 결혼을 하게 된다. 서로 지독하게 사랑했으며, 대장부인 아내에게 히무로가 의지하는 구도의 관계였다.</p>
+                <br>
+
+                <h3 id="s-3-1"><span class="wiki-num">3.1.</span> 과거[스포일러]</h3>
+                <details class="spoiler-details">
+                    <summary>[스포일러]</summary>
+                    <div class="spoiler-content">
+                        <div class="wiki-quote">
+                            "저도 당했거든요.<br>
+                            <b>공이 꽤 많이 들어간 연극</b>을······."
+                            <br><hr>—츠키시마 하지메, 골든카무이 21권 中에서
+                        </div>
+                        <p>츠루미 극장의 피해자 중 한 명.</p>
+                        <p>그저 순수한 러시아 여성인 줄 알았던 아내는 사실 소피아 쪽 혁명군 소속이었다. 일본의 중앙 정부 소속 상등병이었던 히무로에게 접근해 진급을 유도하고, 중사로 진급한 히무로에게서 자연스럽게 여러 정보를 얻어 소피아에게 전달하는 스파이로 활동했다.</p>
+                        <p>정보 장교인 츠루미의 귀에 이 소식이 들어가자, 츠루미는 츠키시마를 강도로 위장시켜 베라를 살해한다. 이후 슬픔에 빠진 히무로에게 접근해 아내를 잃은 슬픔을 공유하는 척 자신에게 의지하게 하고,
+                            혁명군에게 정보를 넘긴 셈인 히무로의 처분을 강등에서 훗카이도 7사단으로 이전하는 것으로 바꿔주었다. 당시 히무로는 츠루미에게 의지하던 상태였기에, 군말 없이 처분을 받아들였으며, 
+                            7사단 츠루미 소대의 무기 관리 및 보급 실무 담당 군조로 활동하게 된다.</p>
+                    </div>
+                </details>
+
+                <h2 id="s-4"><span class="wiki-num">4.</span> 인간관계</h2>
+                <h3 id="s-4-1"><span class="wiki-num">4.1.</span> 베라 체르노바</h3>
+                <p>서로 진실된 사랑을 약속한 배우자.</p>
+                <p>러시아 농가 출신으로, 순박하지만 당돌한 대장부적인 면모가 돋보이는 강인한 여성이다. 푸른 눈에 금발을 가져 남이 보기에도 아름다운 외모이다.</p>
+                <p>농사를 주로 하는 덕에 근육이 붙은 체형. 히무로보다는 작은 키지만 나름 덩치가 있다.</p>
+                <p>일본어가 어눌하고 문맥이 다소 이상하긴 해도 소통이 가능한 정도의 일본어를 구사한다. 히무로와의 결혼 생활에서 일본어를 더 열심히 공부했으며, 히무로가 많이 도와주었다. 이 과정에서 히무로 역시 러시아어를 배웠는데, 덕분에 관광객으로는 충분한 수준의 러시아어를 할 수 있게 되었다.</p>
+                <p>요리를 잘하는 편은 아니지만 유일하게 수시키를 맛있게 잘 만든다. 단 걸 선호하지 않는 히무로의 입맛에 맞는 적당한 단맛을 완벽히 구현해 간식을 좋아하지 않는 히무로도 베라가 만든 수시키는 매우 좋아했다.</p>
+                <br>
+                <details class="spoiler-details">
+                    <summary>[스포일러]</summary>
+                    <div class="spoiler-content">
+                        <p>어린 시절 농가에서 살던 중 소피아를 만나 러시아 혁명군으로 활동했다. 감옥에 있는 소피아를 대신해 일본 중앙 정부의 움직임을 파악하기 위해 히무로와 만났다. 하지만 이를 눈치챈 츠루미로 인해 츠키시마의 손에 살해 당한다.</p>
+                        <p>비록 스파이 활동을 위해 히무로를 만났지만, 그녀의 사랑은 진심이었다. 히무로 역시 그녀를 진심으로 사랑했다. 만약 그녀가 히무로에게 혁명군임을 밝혔다면 그녀를 도와 혁명군이 되었을 것.</p>
+                    </div>
+                </details>
+                <br>
+                
+                <h3 id="s-4-2"><span class="wiki-num">4.2.</span> 오가타 햐쿠노스케</h3>
+                <div style="text-align: center; margin: 15px 0;">
+                    <img src="https://lh3.googleusercontent.com/d/14e_4vZcISVyQhaVAER4qpoRtTipT0sWB" alt="" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid #ddd;">
+                </div>
+                <div class="wiki-quote">
+                    "허어, 아직도 중사십니까? 변함없이 한심한 몰골이네요."
+                    <br><hr>—오가타 햐쿠노스케, 골든카무이 26권 中에서
+                </div>
+                <p>오가타 쪽에서 일방적으로 히무로를 깔보는 관계. 소극적인 태도와 이상적인 정의를 중요시하는 히무로를 아니꼽게 생각한다. 마주칠 일이 있으면 굳이 시비를 거는 수준. 우사미와 함께 있으면 그 정도가 심해진다. 
+                    히무로 역시 매번 시비를 거는 오가타를 불편해하며, 오가타가 탈영한 이후에는 자신의 정의관과 맞지 않는다고 판단해 싫어하게 된다.</p>
+                <br>
+                <details class="spoiler-details">
+                    <summary>[스포일러]</summary>
+                    <div class="spoiler-content">
+                        <p>코이토와 마찬가지로 히무로에게 츠루미 극장의 실체를 까발린다. 이후 맥주 공장 편에서 재회 했을 때도 탈영을 유도하는 듯한 말을 하며 히무로가 혼란에 빠지는 꼴을 즐기는 모습을 보인다.</p>
+                    </div>
+                </details>
+                <br>
+                
+                <h3 id="s-4-3"><span class="wiki-num">4.3.</span> 츠키시마 하지메</h3>
+                <div style="text-align: center; margin: 15px 0;">
+                    <img src="https://lh3.googleusercontent.com/d/1Zq2EIoh4l-zvAGUbEr-wbW_WQKAflYTX" alt="" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid #ddd;">
+                </div>
+                <p>같은 계급, 같은 부대인 만큼 통하는 면이 많다. 휴일이 맞는 날에는 같이 술을 마시며 회포를 풀기도 하는 사이. 부하를 이끌고 츠루미 중위와 코이토 소위의 옆에서 직접 보조하는 츠키시마와 
+                    서류 작업과 물자 관리를 하는 서로의 처지를 누구보다 잘 이해하고 공감하는 동료 관계다. 히무로에게 있어 소대 내에서 가장 친하게 생각하는 동료. 상등병들에게 오래 시달린 날에는
+                     츠키시마에게 위로 받기도 한다.
+                </p>
+                <br>
+                <details class="spoiler-details">
+                    <summary>[스포일러]</summary>
+                    <div class="spoiler-content">
+                        <p>히무로의 아내를 죽인 장본인. 자신이 죽인 인물이 히무로의 아내인 걸 알고 있으나, 히무로에게는 티내지 않았다. 심지어는 아내의 일로 힘들어 하는 히무로를
+                             위로해주기도 했다.</p>
+                        <p>오가타에 의해 모든 진실을 알게 된 히무로가 자신을 피할 때에도 사과는 커녕 동요하지 않는 모습을 보인다. 만약 히무로가 츠키시마에게 사실 진위에 대해 따졌다면
+                             코이토 소위해게했던 것처럼 모든 사실을 담담하게 인정했을 것.</p>
+                        <p>모든 일이 끝나고 코이토 소위의 오른팔이 된 후 히무로와 오랜만에 술자리를 갖는다. 이때 이후로 히무로는 츠키시마를 완전히 용서하고 다시 전과 같은 동료 사이로 지내게 된다. 전에는 히무로가 상등병들에 대해 하소연 하는 일이 대다수였다면
+                             이때부터는 츠키시마가 코이토 소위의 일로 하소연을 하는 일이 잦아졌다고.</p>
+                    </div>
+                </details>
+                <br>
+
+                <h3 id="s-4-4"><span class="wiki-num">4.4.</span> 츠루미 토쿠시로</h3>
+                <div style="text-align: center; margin: 15px 0;">
+                    <img src="https://lh3.googleusercontent.com/d/1HGERU5A-B7oN9xrsa6LQxLTqTJ-5dV3K" alt="" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid #ddd;">
+                </div>
+                <p>혁명군인 아내에게 정보를 흘린 죄로 강등 당할 위기에 처한 히무로를 도와주며 알게 된 사이. 히무로가 강등 당하는 대신 자신이 있는 훗카이도 제7사단으로 옮겨주었다.</p>
+                <p>아내를 잃었다는 공통점으로 히무로 쪽에서 깊은 연대를 느끼고 있다. 츠루미 역시 히무로의 아픔에 공감하며, 아내를 잃은 직후에 많은 위로와 지지를 해주었다.</p>
+                <br>
+                <details class="spoiler-details">
+                    <summary>[스포일러]</summary>
+                    <div class="spoiler-content">
+                        <p>히무로의 아내를 죽이라고 한 장본인. 히무로의 순진함과 서류 작업 능력 등 이용 가능성을 보고 아내를 죽인 후 위로하는 척 자신의 편으로 만들었다.</p>
+                        <p>모든 사실을 알게 된 후 태도가 변한 히무로를 불러 자신의 계급과 상관의 명령으로 인한 어쩔 수 없는 결단이었으며, 그동안 쌓은 연대는 절대 거짓이 아니라며 히무로가 탈영하지 못하도록 단단히 붙잡는다. 
+                            이후 히무로는 츠루미의 고백에 다시 한 번 그를 믿고 츠루미 극장을 끝까지 관람하기로 결심한다.</p>
+                    </div>
+                </details>
+
+
+                <h2 id="s-5"><span class="wiki-num">5.</span> 기타</h2>
+                <ul>
+                    <li>사시가 된 후로 잘 보이지 않으면 고개를 오른쪽으로 기울이는 습관이 생겼다. 복시일 시절 왼눈의 시선이 아래로 향하는 걸 올릴 수 없으니 고개를 기울인 것에서 남은 습관이다.</li>
+                    <li>혈당이 쉽게 오르는 탓에 단 음식을 잘 먹지 않는다. 입이 심심하면 간식 대신 홍차를 즐겨 마신다.</li>
+                    <li>쉬는 시간 없이 하루종일 일만 하는 탓에 워커 홀릭으로 오해 받곤 하지만, 실상은 그냥 빨리 일을 끝내고 집에 가고 싶은 전형적인 직장인 유형이다.</li>
+                    <li>소극적이긴 해도 정의관은 확실해서 할 말은 제때 하고 중사로서 엄격한 면모도 보이지만, 그의 소극적임을 잘 알고 있는 소수의 병사<t style="text-decoration: line-through; color: gray;">상등병들</t>의 경우 그가 아무리 기강을 잡으려 해도 무시하곤 한다.</li>
+                </ul>
+
+                <div class="footnotes">
+                    <p id="fn-1"><a href="#ref-1">[1]</a> 러시아, 우크라이나 등 동유럽권에서 널리 먹는 바싹 말려 구운 고리 형태의 단단한 빵이다. 단단하기 때문에 차에 살짝 적셔 먹기도 한다. 단행본 17권에서도 등장한 적이 있다.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
